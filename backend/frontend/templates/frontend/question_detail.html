@@ -1,0 +1,69 @@
+{% extends "frontend/base.html" %}
+{% block title %}Билет {{ question.ticket_number }} — ПДД Клуб{% endblock %}
+{% block content %}
+<p><a href="{% url 'frontend:question_list' %}">&larr; Ко всем вопросам</a></p>
+
+<div class="detail-card">
+    <span class="topic-badge" style="background:{{ topic_color }}">
+        {% if question.status == 'resolved' %}Разъяснён{% else %}{{ question.topic.name }}{% endif %}
+    </span>
+    <h1 style="font-size:24px;margin:14px 0 6px;">Билет {{ question.ticket_number }}</h1>
+    <p style="font-size:16px;line-height:1.5;">{{ question.text }}</p>
+    {% if question.image %}<img src="{{ question.image.url }}" style="max-width:100%;border-radius:10px;margin:10px 0;">{% endif %}
+    <div class="meta-row">
+        <a href="{% url 'frontend:user_profile' question.author.id %}" style="display:flex;align-items:center;gap:8px;">
+            <span class="avatar">{{ question.author.username|slice:":2"|upper }}</span>{{ question.author.username }}
+        </a> · {{ question.created_at|date:"d.m.Y H:i" }}
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="btn-row" style="margin-top:16px;">
+        <form method="post" action="{% url 'frontend:toggle_review' question.id %}">{% csrf_token %}
+            <button class="btn {% if is_in_review %}filled{% endif %}" type="submit">{% if is_in_review %}В списке на повторение ✓{% else %}В список на повторение{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'frontend:toggle_favorite' question.id %}">{% csrf_token %}
+            <button class="btn-icon {% if is_favorite %}active{% endif %}" type="submit">★</button>
+        </form>
+        {% if can_moderate %}
+        <form method="post" action="{% url 'frontend:moderate_question' question.id %}">{% csrf_token %}
+            <button class="btn" type="submit">{% if question.status == 'resolved' %}Снять отметку{% else %}Отметить «разъяснён»{% endif %}</button>
+        </form>
+        {% endif %}
+        {% if can_delete_question %}
+        <form method="post" action="{% url 'frontend:delete_question' question.id %}" onsubmit="return confirm('Удалить вопрос?');">{% csrf_token %}
+            <button class="btn" style="border-color:#c0392b;color:#c0392b;" type="submit">Удалить вопрос</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<h2 style="font-size:20px;">Обсуждение ({{ comments|length }})</h2>
+<div class="detail-card">
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'frontend:add_comment' question.id %}" style="margin-bottom:12px;">
+        {% csrf_token %}
+        <div class="field"><textarea name="text" rows="3" placeholder="Ваш комментарий..." required></textarea></div>
+        <button class="btn filled" type="submit">Отправить</button>
+    </form>
+    {% else %}
+    <p><a href="{% url 'frontend:login' %}">Войдите</a>, чтобы оставить комментарий.</p>
+    {% endif %}
+
+    {% for c in comments %}
+    <div class="comment">
+        <div class="meta-row"><a href="{% url 'frontend:user_profile' c.author.id %}" style="display:flex;align-items:center;gap:8px;"><span class="avatar">{{ c.author.username|slice:":2"|upper }}</span> <b>{{ c.author.username }}</b></a> · {{ c.created_at|date:"d.m.Y H:i" }}
+            {% if user.is_authenticated and user.id == c.author_id or can_moderate %}
+            <form method="post" action="{% url 'frontend:delete_comment' c.id %}" onsubmit="return confirm('Удалить комментарий?');" style="margin-left:auto;">
+                {% csrf_token %}
+                <button type="submit" style="border:none;background:none;color:#c0392b;cursor:pointer;font-size:12px;">Удалить</button>
+            </form>
+            {% endif %}
+        </div>
+        <p style="margin:6px 0 0;">{{ c.text }}</p>
+    </div>
+    {% empty %}
+    <div class="empty">Пока нет комментариев — будьте первым.</div>
+    {% endfor %}
+</div>
+{% endblock %}

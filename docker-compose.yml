@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: pdd_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pdd_service}
+      POSTGRES_USER: ${POSTGRES_USER:-pdd_service}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pdd_service}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: pdd_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      - db
+    volumes:
+      - static_media:/app/static
+      - media_data:/app/media
+
+  nginx:
+    image: nginx:latest
+    container_name: pdd_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_media:/app/static:ro
+      - media_data:/app/media:ro
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  static_media:
+  media_data:

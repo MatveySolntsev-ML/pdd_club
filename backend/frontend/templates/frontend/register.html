@@ -1,0 +1,32 @@
+{% extends "frontend/base.html" %}
+{% block title %}Регистрация — ПДД Клуб{% endblock %}
+{% block content %}
+<div class="panel">
+    <h1>Создать аккаунт</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="field">
+            <label>Имя пользователя</label>
+            <input type="text" name="username" value="{{ posted.username|default:'' }}" required>
+            {% if errors.username %}<ul class="errorlist"><li>{{ errors.username }}</li></ul>{% endif %}
+        </div>
+        <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ posted.email|default:'' }}" required>
+            {% if errors.email %}<ul class="errorlist"><li>{{ errors.email }}</li></ul>{% endif %}
+        </div>
+        <div class="field">
+            <label>Пароль</label>
+            <input type="password" name="password1" required>
+            {% if errors.password1 %}<ul class="errorlist"><li>{{ errors.password1 }}</li></ul>{% endif %}
+        </div>
+        <div class="field">
+            <label>Повтор пароля</label>
+            <input type="password" name="password2" required>
+            {% if errors.password2 %}<ul class="errorlist"><li>{{ errors.password2 }}</li></ul>{% endif %}
+        </div>
+        <button class="btn filled" type="submit">Зарегистрироваться</button>
+    </form>
+    <p style="margin-top:16px;">Уже есть аккаунт? <a href="{% url 'frontend:login' %}">Войти</a></p>
+</div>
+{% endblock %}

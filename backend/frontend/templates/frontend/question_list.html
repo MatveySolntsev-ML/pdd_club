@@ -1,0 +1,49 @@
+{% extends "frontend/base.html" %}
+{% block title %}Вопросы — ПДД Клуб{% endblock %}
+{% block content %}
+<h1 class="page-title">Вопросы</h1>
+
+<div class="topic-filters">
+    <a href="{% url 'frontend:question_list' %}" class="{% if not current_topic %}active{% endif %}">Все темы</a>
+    {% for t in topics %}
+    <a href="?topic={{ t.slug }}" class="{% if current_topic == t.slug %}active{% endif %}">{{ t.name }}</a>
+    {% endfor %}
+</div>
+
+{% if questions %}
+<div class="grid">
+    {% for q in questions %}
+    <div class="card">
+        <a href="{% url 'frontend:question_detail' q.id %}">
+            <div class="card-media" style="background:{{ q.topic_color }}">Билет {{ q.ticket_number }}</div>
+        </a>
+        <div class="card-body">
+            <span class="topic-badge {% if q.status == 'resolved' %}status-resolved{% endif %}" style="background:{{ q.topic_color }}">
+                {% if q.status == 'resolved' %}Разъяснён{% else %}{{ q.topic.name }}{% endif %}
+            </span>
+            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:70 }}</a>
+            <div class="meta-row">
+                <a href="{% url 'frontend:user_profile' q.author.id %}" style="display:flex;align-items:center;gap:8px;">
+                    <span class="avatar">{{ q.author.username|slice:":2"|upper }}</span>{{ q.author.username }}
+                </a> · {{ q.created_at|date:"d.m.Y" }}
+            </div>
+            {% if user.is_authenticated %}
+            <div class="btn-row">
+                <form method="post" action="{% url 'frontend:toggle_review' q.id %}">{% csrf_token %}
+                    <button class="btn {% if q.id in review_ids %}filled{% endif %}" type="submit">
+                        {% if q.id in review_ids %}В списке ✓{% else %}На повторение{% endif %}
+                    </button>
+                </form>
+                <form method="post" action="{% url 'frontend:toggle_favorite' q.id %}">{% csrf_token %}
+                    <button class="btn-icon {% if q.id in favorite_ids %}active{% endif %}" type="submit">★</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty">Пока нет вопросов по этой теме — <a href="{% url 'frontend:question_create' %}">создайте первый</a>.</div>
+{% endif %}
+{% endblock %}

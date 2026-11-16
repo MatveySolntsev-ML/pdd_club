@@ -1,0 +1,29 @@
+{% extends "frontend/base.html" %}
+{% block title %}Новый вопрос — ПДД Клуб{% endblock %}
+{% block content %}
+<div class="panel">
+    <h1>Новый вопрос</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="field">
+            <label>Тема раздела ПДД</label>
+            <select name="topic">
+                {% for t in topics %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label>Номер билета</label>
+            <input type="number" name="ticket_number" required>
+        </div>
+        <div class="field">
+            <label>Текст вопроса</label>
+            <textarea name="text" rows="5" required></textarea>
+        </div>
+        <div class="field">
+            <label>Изображение (необязательно)</label>
+            <input type="file" name="image">
+        </div>
+        <button class="btn filled" type="submit">Опубликовать</button>
+    </form>
+</div>
+{% endblock %}

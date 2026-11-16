@@ -1,0 +1,40 @@
+{% extends "frontend/base.html" %}
+{% block title %}{{ profile_user.username }} — ПДД Клуб{% endblock %}
+{% block content %}
+<div class="detail-card">
+    <div class="meta-row" style="font-size:16px;">
+        <span class="avatar">{{ profile_user.username|slice:":2"|upper }}</span> <b>{{ profile_user.username }}</b>
+        {% if profile_user.role == "moderator" %}<span class="topic-badge" style="background:#6b7280;">Модератор</span>{% endif %}
+    </div>
+    <p style="color:#777;margin-top:8px;">Опубликовано вопросов: {{ questions_count }} · подписчиков: {{ subscribers_count }}</p>
+
+    {% if user.is_authenticated and user != profile_user %}
+    <form method="post" action="{% url 'frontend:toggle_subscribe' profile_user.id %}" style="margin-top:10px;">
+        {% csrf_token %}
+        <button class="btn {% if is_following %}filled{% endif %}" type="submit">
+            {% if is_following %}Вы подписаны ✓ (нажмите, чтобы отписаться){% else %}Подписаться{% endif %}
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+<h2 style="font-size:20px;">Вопросы автора</h2>
+{% if questions %}
+<div class="grid">
+    {% for q in questions %}
+    <div class="card">
+        <a href="{% url 'frontend:question_detail' q.id %}">
+            <div class="card-media" style="background:{{ q.topic_color }}">Билет {{ q.ticket_number }}</div>
+        </a>
+        <div class="card-body">
+            <span class="topic-badge" style="background:{{ q.topic_color }}">{{ q.topic.name }}</span>
+            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:70 }}</a>
+            <div class="meta-row">{{ q.created_at|date:"d.m.Y" }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty">Пока нет опубликованных вопросов.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "frontend/base.html" %}
+{% block title %}Вход — ПДД Клуб{% endblock %}
+{% block content %}
+<div class="panel">
+    <h1>Вход</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="field"><label>Имя пользователя</label><input type="text" name="username" required></div>
+        <div class="field"><label>Пароль</label><input type="password" name="password" required></div>
+        {% if error %}<p style="color:#c0392b;">{{ error }}</p>{% endif %}
+        <button class="btn filled" type="submit">Войти</button>
+    </form>
+    <p style="margin-top:16px;">Нет аккаунта? <a href="{% url 'frontend:register' %}">Зарегистрироваться</a></p>
+</div>
+{% endblock %}
