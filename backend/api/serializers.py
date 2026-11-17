@@ -41,7 +41,7 @@ class TopicSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    author = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = Comment
@@ -50,7 +50,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    author = UserProfileSerializer(read_only=True)
     topic = TopicSerializer(read_only=True)
     topic_id = serializers.PrimaryKeyRelatedField(source="topic", queryset=Topic.objects.all(), write_only=True)
 

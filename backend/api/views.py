@@ -26,7 +26,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Creat
     def get_serializer_class(self):
         if self.action == "create":
             return UserRegistrationSerializer
-        if self.action == "retrieve":
+        if self.action in ("list", "retrieve", "subscriptions"):
             return UserProfileSerializer
         return UserSerializer
 

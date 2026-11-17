@@ -1,14 +1,31 @@
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.validators import validate_image_file_extension
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from PIL import Image, UnidentifiedImageError
 
 from favorites.models import Favorite, ReviewList
 from questions.models import Comment, Question, Topic
 from subscriptions.models import Subscription
 
 User = get_user_model()
+
+
+def validate_uploaded_image(f):
+    """Reject anything that isn't a genuine, safely-extensioned image file."""
+    if f is None:
+        return None
+    validate_image_file_extension(f)
+    try:
+        Image.open(f).verify()
+    except UnidentifiedImageError:
+        raise ValidationError("Файл не распознан как изображение.")
+    finally:
+        f.seek(0)
+    return f
 
 TOPIC_COLORS = ["#2563eb", "#d946ef", "#f59e0b", "#16a34a", "#dc2626", "#0891b2", "#7c3aed", "#ea580c"]
 
@@ -114,12 +131,17 @@ def question_create(request):
     topics = Topic.objects.all()
     if request.method == "POST":
         topic = get_object_or_404(Topic, pk=request.POST.get("topic"))
+        try:
+            image = validate_uploaded_image(request.FILES.get("image"))
+        except ValidationError as exc:
+            messages.error(request, exc.messages[0])
+            return render(request, "frontend/question_form.html", {"active_tab": "questions", "topics": topics})
         question = Question.objects.create(
             author=request.user,
             topic=topic,
             ticket_number=request.POST.get("ticket_number"),
             text=request.POST.get("text"),
-            image=request.FILES.get("image"),
+            image=image,
         )
         return redirect("frontend:question_detail", pk=question.id)
     return render(request, "frontend/question_form.html", {"active_tab": "questions", "topics": topics})
