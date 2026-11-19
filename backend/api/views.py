@@ -69,7 +69,7 @@ class TopicViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Ge
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.select_related("author", "topic").all()
     serializer_class = QuestionSerializer
-    permission_classes = (IsAuthorOrModeratorOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrModeratorOrReadOnly)
     filterset_fields = ("topic", "ticket_number")
 
     def perform_create(self, serializer):
