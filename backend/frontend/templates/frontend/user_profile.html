@@ -4,9 +4,9 @@
 <div class="detail-card">
     <div class="meta-row" style="font-size:16px;">
         <span class="avatar">{{ profile_user.username|slice:":2"|upper }}</span> <b>{{ profile_user.username }}</b>
-        {% if profile_user.role == "moderator" %}<span class="topic-badge" style="background:#6b7280;">Модератор</span>{% endif %}
+        {% if profile_user.role == "moderator" %}<span class="topic-badge" >Модератор</span>{% endif %}
     </div>
-    <p style="color:#777;margin-top:8px;">Опубликовано вопросов: {{ questions_count }} · подписчиков: {{ subscribers_count }}</p>
+    <p class="muted">Опубликовано вопросов: {{ questions_count }} · подписчиков: {{ subscribers_count }}</p>
 
     {% if user.is_authenticated and user != profile_user %}
     <form method="post" action="{% url 'frontend:toggle_subscribe' profile_user.id %}" style="margin-top:10px;">
@@ -24,11 +24,11 @@
     {% for q in questions %}
     <div class="card">
         <a href="{% url 'frontend:question_detail' q.id %}">
-            <div class="card-media" style="background:{{ q.topic_color }}">Билет {{ q.ticket_number }}</div>
+            {% include "frontend/question_preview.html" %}
         </a>
         <div class="card-body">
-            <span class="topic-badge" style="background:{{ q.topic_color }}">{{ q.topic.name }}</span>
-            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:70 }}</a>
+            {% include "frontend/question_badges.html" %}
+            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:125 }}</a>
             <div class="meta-row">{{ q.created_at|date:"d.m.Y" }}</div>
         </div>
     </div>

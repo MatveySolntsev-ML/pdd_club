@@ -30,6 +30,10 @@ python manage.py runserver
 
 ## Структура
 
+Коллекция для проверки REST API находится в `postman/pdd_club.postman_collection.json`.
+Импортируйте её в Postman, укажите локальные `username` и `password` и запустите коллекцию.
+Для Docker установите `base_url` в `http://127.0.0.1`. По умолчанию используется сервер Django на порту 8000.
+
 - `users` — модель пользователя, аутентификация (JWT)
 - `questions` — вопросы, темы ПДД, комментарии
 - `favorites` — избранное и список на повторение

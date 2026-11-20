@@ -27,19 +27,6 @@ def validate_uploaded_image(f):
         f.seek(0)
     return f
 
-TOPIC_COLORS = ["#2563eb", "#d946ef", "#f59e0b", "#16a34a", "#dc2626", "#0891b2", "#7c3aed", "#ea580c"]
-
-
-def topic_color(topic_id):
-    return TOPIC_COLORS[topic_id % len(TOPIC_COLORS)]
-
-
-def _attach_colors(questions):
-    for q in questions:
-        q.topic_color = topic_color(q.topic_id)
-    return questions
-
-
 def _user_flags(request, questions):
     if not request.user.is_authenticated:
         return set(), set()
@@ -57,7 +44,6 @@ def landing(request):
         "comments": Comment.objects.count(),
     }
     recent = list(Question.objects.select_related("author", "topic").order_by("-created_at")[:3])
-    _attach_colors(recent)
     return render(request, "frontend/landing.html", {"stats": stats, "recent": recent})
 
 
@@ -69,7 +55,6 @@ def question_list(request):
         questions = questions.filter(topic__slug=topic_slug)
         current_topic = topic_slug
     questions = list(questions)
-    _attach_colors(questions)
     favorite_ids, review_ids = _user_flags(request, questions)
     return render(request, "frontend/question_list.html", {
         "active_tab": "questions",
@@ -93,7 +78,6 @@ def question_detail(request, pk):
     return render(request, "frontend/question_detail.html", {
         "active_tab": "questions",
         "question": question,
-        "topic_color": topic_color(question.topic_id),
         "comments": comments,
         "is_favorite": is_favorite,
         "is_in_review": is_in_review,
@@ -192,7 +176,6 @@ def moderate_question(request, pk):
 @login_required
 def favorites(request):
     questions = list(Question.objects.select_related("author", "topic").filter(favorited_by__user=request.user).order_by("-created_at"))
-    _attach_colors(questions)
     favorite_ids, review_ids = _user_flags(request, questions)
     return render(request, "frontend/list_page.html", {
         "active_tab": "favorites", "title": "Избранное", "questions": questions,
@@ -204,7 +187,6 @@ def favorites(request):
 @login_required
 def review_list(request):
     questions = list(Question.objects.select_related("author", "topic").filter(in_review_lists__user=request.user).order_by("-created_at"))
-    _attach_colors(questions)
     favorite_ids, review_ids = _user_flags(request, questions)
     return render(request, "frontend/list_page.html", {
         "active_tab": "review", "title": "Список на повторение", "questions": questions,
@@ -218,7 +200,6 @@ def review_list(request):
 def feed(request):
     authors = User.objects.filter(subscribers__follower=request.user)
     questions = list(Question.objects.select_related("author", "topic").filter(author__in=authors).order_by("-created_at"))
-    _attach_colors(questions)
     favorite_ids, review_ids = _user_flags(request, questions)
     return render(request, "frontend/list_page.html", {
         "active_tab": "feed", "title": "Лента подписок", "questions": questions,
@@ -230,7 +211,6 @@ def feed(request):
 def user_profile(request, pk):
     profile_user = get_object_or_404(User, pk=pk)
     questions = list(Question.objects.select_related("topic").filter(author=profile_user).order_by("-created_at"))
-    _attach_colors(questions)
     is_following = False
     if request.user.is_authenticated and request.user != profile_user:
         is_following = Subscription.objects.filter(follower=request.user, author=profile_user).exists()

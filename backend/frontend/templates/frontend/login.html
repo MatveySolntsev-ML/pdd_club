@@ -7,7 +7,7 @@
         {% csrf_token %}
         <div class="field"><label>Имя пользователя</label><input type="text" name="username" required></div>
         <div class="field"><label>Пароль</label><input type="password" name="password" required></div>
-        {% if error %}<p style="color:#c0392b;">{{ error }}</p>{% endif %}
+        {% if error %}<p class="error-text">{{ error }}</p>{% endif %}
         <button class="btn filled" type="submit">Войти</button>
     </form>
     <p style="margin-top:16px;">Нет аккаунта? <a href="{% url 'frontend:register' %}">Зарегистрироваться</a></p>

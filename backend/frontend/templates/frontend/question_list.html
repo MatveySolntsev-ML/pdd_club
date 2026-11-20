@@ -15,13 +15,11 @@
     {% for q in questions %}
     <div class="card">
         <a href="{% url 'frontend:question_detail' q.id %}">
-            <div class="card-media" style="background:{{ q.topic_color }}">Билет {{ q.ticket_number }}</div>
+            {% include "frontend/question_preview.html" %}
         </a>
         <div class="card-body">
-            <span class="topic-badge {% if q.status == 'resolved' %}status-resolved{% endif %}" style="background:{{ q.topic_color }}">
-                {% if q.status == 'resolved' %}Разъяснён{% else %}{{ q.topic.name }}{% endif %}
-            </span>
-            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:70 }}</a>
+            {% include "frontend/question_badges.html" %}
+            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:125 }}</a>
             <div class="meta-row">
                 <a href="{% url 'frontend:user_profile' q.author.id %}" style="display:flex;align-items:center;gap:8px;">
                     <span class="avatar">{{ q.author.username|slice:":2"|upper }}</span>{{ q.author.username }}

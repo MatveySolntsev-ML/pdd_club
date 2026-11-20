@@ -4,7 +4,7 @@
 <h1 class="page-title">Профиль</h1>
 <div class="detail-card">
     <div class="meta-row" style="font-size:16px;"><span class="avatar">{{ profile_user.username|slice:":2"|upper }}</span> <b>{{ profile_user.username }}</b></div>
-    <p style="color:#777;margin-top:8px;">{{ profile_user.email }} · роль: {{ profile_user.get_role_display }}</p>
+    <p class="muted">{{ profile_user.email }} · роль: {{ profile_user.get_role_display }}</p>
     <p>Опубликовано вопросов: {{ questions_count }}</p>
 </div>
 

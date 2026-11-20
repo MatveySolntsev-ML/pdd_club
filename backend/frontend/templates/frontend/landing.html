@@ -2,12 +2,10 @@
 {% load static %}
 {% block title %}ПДД Клуб — сообщество тех, кто готовится к экзамену{% endblock %}
 {% block content %}
-<div style="padding:60px 0 50px;text-align:center;">
-    <div style="display:inline-block;margin-bottom:18px;">
-        <img src="{% static 'frontend/images/logo_icon.png' %}" alt="ПДД Клуб" style="width:96px;height:96px;">
-    </div>
-    <h1 style="font-size:46px;font-weight:800;margin:0 0 16px;">Готовимся к экзамену по ПДД вместе</h1>
-    <p style="font-size:18px;color:#555;max-width:560px;margin:0 auto 32px;">
+<section class="hero">
+    <img src="{% static 'frontend/images/logo_icon.png' %}" alt="">
+    <h1>Готовимся к экзамену по ПДД вместе</h1>
+    <p>
         Разбирайте сложные билеты, обсуждайте спорные вопросы с другими кандидатами
         и собирайте личный список на повторение — без скучной зубрёжки в одиночку.
     </p>
@@ -19,13 +17,13 @@
         <a class="btn" style="padding:14px 32px;font-size:15px;" href="{% url 'frontend:question_list' %}">Посмотреть вопросы</a>
     {% endif %}
     </div>
-</div>
+</section>
 
 <div class="grid stats-grid">
-    <div class="detail-card" style="text-align:center;"><div style="font-size:30px;font-weight:800;">{{ stats.questions }}</div>вопросов</div>
-    <div class="detail-card" style="text-align:center;"><div style="font-size:30px;font-weight:800;">{{ stats.topics }}</div>тем ПДД</div>
-    <div class="detail-card" style="text-align:center;"><div style="font-size:30px;font-weight:800;">{{ stats.users }}</div>участников</div>
-    <div class="detail-card" style="text-align:center;"><div style="font-size:30px;font-weight:800;">{{ stats.comments }}</div>обсуждений</div>
+    <div class="detail-card" style="text-align:center;"><strong>{{ stats.questions }}</strong>вопросов</div>
+    <div class="detail-card" style="text-align:center;"><strong>{{ stats.topics }}</strong>тем ПДД</div>
+    <div class="detail-card" style="text-align:center;"><strong>{{ stats.users }}</strong>участников</div>
+    <div class="detail-card" style="text-align:center;"><strong>{{ stats.comments }}</strong>комментариев</div>
 </div>
 
 {% if recent %}
@@ -34,11 +32,11 @@
     {% for q in recent %}
     <div class="card">
         <a href="{% url 'frontend:question_detail' q.id %}">
-            <div class="card-media" style="background:{{ q.topic_color }}">Билет {{ q.ticket_number }}</div>
+            {% include "frontend/question_preview.html" %}
         </a>
         <div class="card-body">
-            <span class="topic-badge" style="background:{{ q.topic_color }}">{{ q.topic.name }}</span>
-            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:70 }}</a>
+            {% include "frontend/question_badges.html" %}
+            <a href="{% url 'frontend:question_detail' q.id %}" class="card-title">{{ q.text|truncatechars:125 }}</a>
             <div class="meta-row"><a href="{% url 'frontend:user_profile' q.author.id %}" style="display:flex;align-items:center;gap:8px;"><span class="avatar">{{ q.author.username|slice:":2"|upper }}</span>{{ q.author.username }}</a></div>
         </div>
     </div>

@@ -1,15 +1,14 @@
 {% extends "frontend/base.html" %}
 {% block title %}Билет {{ question.ticket_number }} — ПДД Клуб{% endblock %}
 {% block content %}
-<p><a href="{% url 'frontend:question_list' %}">&larr; Ко всем вопросам</a></p>
+<div class="discussion">
+<p><a class="text-link" href="{% url 'frontend:question_list' %}">&larr; Ко всем вопросам</a></p>
 
 <div class="detail-card">
-    <span class="topic-badge" style="background:{{ topic_color }}">
-        {% if question.status == 'resolved' %}Разъяснён{% else %}{{ question.topic.name }}{% endif %}
-    </span>
+    {% include "frontend/question_badges.html" with q=question %}
     <h1 style="font-size:24px;margin:14px 0 6px;">Билет {{ question.ticket_number }}</h1>
-    <p style="font-size:16px;line-height:1.5;">{{ question.text }}</p>
-    {% if question.image %}<img src="{{ question.image.url }}" style="max-width:100%;border-radius:10px;margin:10px 0;">{% endif %}
+    <p class="question-text">{{ question.text }}</p>
+    {% if question.image %}<img src="{{ question.image.url }}" class="question-image" alt="Иллюстрация к вопросу">{% endif %}
     <div class="meta-row">
         <a href="{% url 'frontend:user_profile' question.author.id %}" style="display:flex;align-items:center;gap:8px;">
             <span class="avatar">{{ question.author.username|slice:":2"|upper }}</span>{{ question.author.username }}
@@ -31,7 +30,7 @@
         {% endif %}
         {% if can_delete_question %}
         <form method="post" action="{% url 'frontend:delete_question' question.id %}" onsubmit="return confirm('Удалить вопрос?');">{% csrf_token %}
-            <button class="btn" style="border-color:#c0392b;color:#c0392b;" type="submit">Удалить вопрос</button>
+            <button class="btn danger" type="submit">Удалить вопрос</button>
         </form>
         {% endif %}
     </div>
@@ -47,7 +46,8 @@
         <button class="btn filled" type="submit">Отправить</button>
     </form>
     {% else %}
-    <p><a href="{% url 'frontend:login' %}">Войдите</a>, чтобы оставить комментарий.</p>
+    <div class="discussion">
+<p><a class="text-link" href="{% url 'frontend:login' %}">Войдите</a>, чтобы оставить комментарий.</p>
     {% endif %}
 
     {% for c in comments %}
@@ -56,7 +56,7 @@
             {% if user.is_authenticated and user.id == c.author_id or can_moderate %}
             <form method="post" action="{% url 'frontend:delete_comment' c.id %}" onsubmit="return confirm('Удалить комментарий?');" style="margin-left:auto;">
                 {% csrf_token %}
-                <button type="submit" style="border:none;background:none;color:#c0392b;cursor:pointer;font-size:12px;">Удалить</button>
+                <button type="submit" style="border:none;background:none;color:var(--danger);cursor:pointer;font-size:12px;">Удалить</button>
             </form>
             {% endif %}
         </div>
@@ -65,5 +65,6 @@
     {% empty %}
     <div class="empty">Пока нет комментариев — будьте первым.</div>
     {% endfor %}
+</div>
 </div>
 {% endblock %}
